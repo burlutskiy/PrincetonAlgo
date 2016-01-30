@@ -8,6 +8,8 @@ public class PercolationTest {
 		Percolation percolation = new Percolation(1);
 		Assert.assertFalse(percolation.percolates());
 		Assert.assertFalse(percolation.isFull(1, 1));
+		percolation.open(1, 1);
+		Assert.assertTrue(percolation.percolates());
 	}
 
 	@Test
@@ -20,6 +22,17 @@ public class PercolationTest {
 		Assert.assertFalse(percolation.isFull(2, 2));
 	}
 
+	@Test
+	public void test3x3Multi() {
+		Percolation percolation = new Percolation(3);
+		percolation.open(1, 3);
+		percolation.open(2, 3);
+		percolation.open(3, 3);
+		percolation.open(3, 1);
+		percolation.open(2, 1);
+		percolation.open(1, 1);
+		Assert.assertTrue(percolation.isFull(2, 1));
+	}
 	@Test
 	public void test3x3() {
 		Percolation percolation = new Percolation(3);
