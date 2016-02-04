@@ -9,10 +9,8 @@ public class Percolation {
 	private final BitSet bsites;
 
 	public Percolation(int N) {
-		// create N-by-N grid, with all sites blocked
-		if (N <= 0) {
+		if (N <= 0) 
 			throw new IllegalArgumentException();
-		}
 		this.uf = new WeightedQuickUnionUF(N * N + 2);
 		this.ufBase = new WeightedQuickUnionUF(N * N + 1);
 		this.n = N;
@@ -25,33 +23,18 @@ public class Percolation {
 	}
 
 	public void open(int i, int j) {
-		// open site (row i, column j) if it is not
-		// open already
 		checkBounds(i, j);
 		if (!bsites.get((i - 1) * n + (j - 1))) {
 			bsites.set((i - 1) * n + (j - 1));
 			int p = (int) (i - 1) * n + j;
-			// 1. check left
-			if (j - 2 >= 0 && bsites.get((i - 1) * n + (j - 2))) {
-				int q = (int) (i - 1) * n + (j - 1);
-				openSite(p, q);
-			}
-			// 2. check top
-			if (i - 2 >= 0 && bsites.get((i - 2) * n + (j - 1))) {
-				int q = (int) (i - 2) * n + j;
-				openSite(p, q);
-			}
-			// 3. check right
-			if (j < n && bsites.get((i - 1) * n + (j))) {
-				// printSites();
-				int q = (int) (i - 1) * n + (j + 1);
-				openSite(p, q);
-			}
-			// 4. check bottom
-			if (i < n && bsites.get((i) * n + (j - 1))) {
-				int q = (int) i * n + j;
-				openSite(p, q);
-			}
+			if (j - 2 >= 0 && bsites.get((i - 1) * n + (j - 2)))// 1. check left
+				openSite(p, (int) (i - 1) * n + (j - 1));
+			if (i - 2 >= 0 && bsites.get((i - 2) * n + (j - 1)))// 2. check top
+				openSite(p, (int) (i - 2) * n + j);
+			if (j < n && bsites.get((i - 1) * n + (j))) // 3. check right
+				openSite(p, (int) (i - 1) * n + (j + 1));
+			if (i < n && bsites.get((i) * n + (j - 1))) // 4. check bottom
+				openSite(p, (int) i * n + j);
 		}
 	}
 
@@ -63,9 +46,8 @@ public class Percolation {
 	}
 
 	private void checkBounds(int i, int j) {
-		if (i <= 0 || j <= 0 || i > n || j > n) {
+		if (i <= 0 || j <= 0 || i > n || j > n)
 			throw new IndexOutOfBoundsException();
-		}
 	}
 
 	public boolean isOpen(int i, int j) { // is site (row i, column j) open?
@@ -75,9 +57,7 @@ public class Percolation {
 
 	public boolean isFull(int i, int j) { // is site (row i, column j) full?
 		checkBounds(i, j);
-		int p = 0;
-		int q = (int) (i - 1) * n + j;
-		return bsites.get((i - 1) * n + (j - 1)) && ufBase.connected(p, q);
+		return bsites.get((i - 1) * n + (j - 1)) && ufBase.connected(0, (int) (i - 1) * n + j);
 	}
 
 	public boolean percolates() {
