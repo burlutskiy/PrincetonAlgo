@@ -4,45 +4,73 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 	private final WeightedQuickUnionUF uf;
-	private final WeightedQuickUnionUF ufBase;
 	private final int n;
-	private final BitSet bsites;
+	private final BitSet openSites;
+	private final BitSet topCC;
+	private final BitSet bottomCC;
+	private boolean percolates;
 
 	public Percolation(int N) {
-		if (N <= 0) 
+		if (N <= 0)
 			throw new IllegalArgumentException();
-		this.uf = new WeightedQuickUnionUF(N * N + 2);
-		this.ufBase = new WeightedQuickUnionUF(N * N + 1);
+		this.uf = new WeightedQuickUnionUF(N * N);
 		this.n = N;
-		this.bsites = new BitSet(n * n);
-		for (int i = 1; i <= N; i++) {
-			uf.union(0, i);
-			ufBase.union(0, i);
-			uf.union(n * n + 1, n * (n - 1) + i);
-		}
+		this.openSites = new BitSet(n * n);
+		this.topCC = new BitSet(n * n);
+		this.bottomCC = new BitSet(n * n);
+		topCC.set(0, n);
+		bottomCC.set(n * (n - 1), n * n);
 	}
 
 	public void open(int i, int j) {
-		checkBounds(i, j);
-		if (!bsites.get((i - 1) * n + (j - 1))) {
-			bsites.set((i - 1) * n + (j - 1));
-			int p = (int) (i - 1) * n + j;
-			if (j - 2 >= 0 && bsites.get((i - 1) * n + (j - 2)))// 1. check left
-				openSite(p, (int) (i - 1) * n + (j - 1));
-			if (i - 2 >= 0 && bsites.get((i - 2) * n + (j - 1)))// 2. check top
-				openSite(p, (int) (i - 2) * n + j);
-			if (j < n && bsites.get((i - 1) * n + (j))) // 3. check right
-				openSite(p, (int) (i - 1) * n + (j + 1));
-			if (i < n && bsites.get((i) * n + (j - 1))) // 4. check bottom
-				openSite(p, (int) i * n + j);
+		checkBounds(i--, j--);
+		int p = (int) i * n + j;
+		if (!isOpen(p)) {
+			openSites.set(p);
+			if (j != 0 && isOpen(i * n + j - 1)) // 1. check left
+				openSite(p, i * n + j - 1);
+			if (i != 0 && isOpen((i - 1) * n + j)) // 2. check top
+				openSite(p, (i - 1) * n + j);
+			if (j != n - 1 && isOpen(i * n + (j + 1))) // 3. check right
+				openSite(p, i * n + (j + 1));
+			if (i != n - 1 && isOpen((i + 1) * n + j)) // 4. check bottom
+				openSite(p, (i + 1) * n + j);
 		}
 	}
 
 	private void openSite(int p, int q) {
-		if (!ufBase.connected(p, q)) {
+		if (!uf.connected(p, q)) {
+			int ccp = uf.find(p);
+			int ccq = uf.find(q);
+			if (!percolates && (connectedToTop(ccp) || connectedToTop(ccq)) 
+					&& (connectedToBottom(ccp) || connectedToBottom(ccq)))
+				percolates = true;
+			if (connectedToTop(ccp) && !connectedToTop(ccq))
+				connectToTop(ccq);
+			else if (!connectedToTop(ccp) && connectedToTop(ccq))
+				connectToTop(ccp);
+			if (connectedToBottom(ccp) && !connectedToBottom(ccq))
+				connectToBottom(ccq);
+			else if (!connectedToBottom(ccp) && connectedToBottom(ccq))
+				connectToBottom(ccp);
 			uf.union(p, q);
-			ufBase.union(p, q);
 		}
+	}
+
+	private void connectToTop(int cc) {
+		topCC.set(cc);
+	}
+
+	private void connectToBottom(int cc) {
+		bottomCC.set(cc);
+	}
+
+	private boolean connectedToTop(int cc) {
+		return topCC.get(cc);
+	}
+
+	private boolean connectedToBottom(int cc) {
+		return bottomCC.get(cc);
 	}
 
 	private void checkBounds(int i, int j) {
@@ -51,17 +79,21 @@ public class Percolation {
 	}
 
 	public boolean isOpen(int i, int j) { // is site (row i, column j) open?
-		checkBounds(i, j);
-		return bsites.get((i - 1) * n + (j - 1));
+		checkBounds(i--, j--);
+		return openSites.get(i * n + j);
+	}
+
+	private boolean isOpen(int p) {
+		return openSites.get(p);
 	}
 
 	public boolean isFull(int i, int j) { // is site (row i, column j) full?
-		checkBounds(i, j);
-		return bsites.get((i - 1) * n + (j - 1)) && ufBase.connected(0, (int) (i - 1) * n + j);
+		checkBounds(i--, j--);
+		return connectedToTop(uf.find(i * n + j)) && openSites.get(i * n + j);
 	}
 
 	public boolean percolates() {
-		return uf.connected(0, n * n + 1) && !bsites.isEmpty();
+		return percolates || (!openSites.isEmpty() && n == 1);
 	}
 
 }
