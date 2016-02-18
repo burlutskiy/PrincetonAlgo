@@ -16,6 +16,16 @@ public class Draw {
 		readAndPrintSegments("test/input40.txt");
 	}
 	
+	@Test
+	public void draw4() throws Exception {
+		readAndPrintSegments("test/mystery10089.txt");
+	}
+	
+	@Test
+	public void draw5() throws Exception {
+		readAndPrintSegments("test/input10000.txt");
+	}
+	
 	public void readAndPrintSegments(String file) {
 		// read the N points from a file
 		In in = new In(file);
@@ -37,7 +47,7 @@ public class Draw {
 		StdDraw.show();
 
 		// print and draw the line segments
-		BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+		FastCollinearPoints collinear = new FastCollinearPoints(points);
 		for (LineSegment segment : collinear.segments()) {
 			StdOut.println(segment);
 			segment.draw();
