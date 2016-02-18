@@ -8,6 +8,21 @@ import org.junit.Test;
 public class BruteCollinearPointsTest {
 
 	@Test
+	public void testInput1() throws Exception {
+		readAndPrintSegments("test/input1.txt");
+	}
+
+	@Test
+	public void testInput2() throws Exception {
+		readAndPrintSegments("test/input2.txt");
+	}
+	
+	@Test
+	public void testInput3() throws Exception {
+		readAndPrintSegments("test/input3.txt");
+	}
+
+	@Test
 	public void testInput6() throws Exception {
 		readAndPrintSegments("test/input6.txt");
 	}

@@ -13,6 +13,23 @@ public class FastCollinearPointsTest {
 	}
 
 	@Test
+	public void testInput6dup() throws Exception {
+		readAndPrintSegments("test/input6dup.txt");
+	}
+
+	@Test
+	public void testDup() throws Exception {
+		Point[] points = new Point[] {new Point(14172,5086), new Point(23711,877),new Point(23711,877) };
+		FastCollinearPoints cp = new FastCollinearPoints(points);
+		cp.segments();
+	}
+
+	@Test
+	public void testEdgeCase() throws Exception {
+		readAndPrintSegments("test/edgecase16.txt");
+	}
+
+	@Test
 	public void testInput8() throws Exception {
 		readAndPrintSegments("test/input8.txt");
 	}
@@ -20,6 +37,21 @@ public class FastCollinearPointsTest {
 	@Test
 	public void testinput40() throws Exception {
 		readAndPrintSegments("test/input40.txt");
+	}
+	
+	@Test
+	public void testinput80() throws Exception {
+		readAndPrintSegments("test/input80.txt");
+	}
+
+	@Test
+	public void testinput4000() throws Exception {
+		readAndPrintSegments("test/input4000.txt");
+	}
+
+	@Test
+	public void testinput8000() throws Exception {
+		readAndPrintSegments("test/input8000.txt");
 	}
 	
 	private void readAndPrintSegments(String testFilePath) throws Exception{
