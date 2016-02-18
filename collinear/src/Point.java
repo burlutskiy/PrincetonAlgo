@@ -71,7 +71,7 @@ public class Point implements Comparable<Point> {
 		else if (Double.compare(that.y, y) == 0)
 			return +0.0;
 		else
-			return (that.y - y) / (that.x - x);
+			return (that.y - this.y) / (that.x - this.x + .0);
 	}
 
 	private boolean equalPoint(Point that) {
@@ -109,7 +109,7 @@ public class Point implements Comparable<Point> {
 	public Comparator<Point> slopeOrder() {
 		return new Comparator<Point>() {
 			public int compare(Point o1, Point o2) {
-				return Double.compare(o1.slopeTo(o1), o2.slopeTo(o2));
+				return Double.compare(slopeTo(o1), slopeTo(o2));
 			}
 		};
 	}
@@ -126,10 +126,4 @@ public class Point implements Comparable<Point> {
 		return "(" + x + ", " + y + ")";
 	}
 
-	/**
-	 * Unit tests the Point data type.
-	 */
-	public static void main(String[] args) {
-		/* YOUR CODE HERE */
-	}
 }

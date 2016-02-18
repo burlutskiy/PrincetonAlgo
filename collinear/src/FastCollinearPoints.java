@@ -5,12 +5,10 @@
  *
  */
 public class FastCollinearPoints {
-	public FastCollinearPoints(Point[] points){
-
+	public FastCollinearPoints(Point[] points) {
 	}
 
-	public int numberOfSegments() 
-	{
+	public int numberOfSegments() {
 		return -1;
 	}
 
