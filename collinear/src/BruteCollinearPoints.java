@@ -34,28 +34,28 @@ public class BruteCollinearPoints {
 
 	public BruteCollinearPoints(Point[] points) {
 		select4TupleAndVisit(points);
-		PointTuple[] tuples = segmentPoints.toArray(new PointTuple[segmentPoints.size()]);
-		Arrays.sort(tuples, new Comparator<PointTuple>() {
-			public int compare(PointTuple o1, PointTuple o2) {
-				return Double.compare(o1.slope, o2.slope);
-			}
-		});
-		double slope = tuples[0].slope;
-		Point min = tuples[0].p1;
-		Point max = tuples[0].p2;
-		for (int i = 1; i < tuples.length; i++) {
-			if(Double.compare(tuples[i].slope, slope) == 0){
-				if(tuples[i].p1.compareTo(min) < 0)
-					min = tuples[i].p1; 
-				if(tuples[i].p2.compareTo(max) > 0)
-					max = tuples[i].p2; 
-			} else {
-				lineSegments.add(new LineSegment(min, max));
-				min = tuples[i].p1;
-				max = tuples[i].p2;
-			}
-		}
-		lineSegments.add(new LineSegment(min, max));
+//		PointTuple[] tuples = segmentPoints.toArray(new PointTuple[segmentPoints.size()]);
+//		Arrays.sort(tuples, new Comparator<PointTuple>() {
+//			public int compare(PointTuple o1, PointTuple o2) {
+//				return Double.compare(o1.slope, o2.slope);
+//			}
+//		});
+//		double slope = tuples[0].slope;
+//		Point min = tuples[0].p1;
+//		Point max = tuples[0].p2;
+//		for (int i = 1; i < tuples.length; i++) {
+//			if(Double.compare(tuples[i].slope, slope) == 0){
+//				if(tuples[i].p1.compareTo(min) < 0)
+//					min = tuples[i].p1; 
+//				if(tuples[i].p2.compareTo(max) > 0)
+//					max = tuples[i].p2; 
+//			} else {
+//				lineSegments.add(new LineSegment(min, max));
+//				min = tuples[i].p1;
+//				max = tuples[i].p2;
+//			}
+//		}
+//		lineSegments.add(new LineSegment(min, max));
 	}
 	
 	private void visit(Point[] points, int[] c) {
@@ -70,7 +70,8 @@ public class BruteCollinearPoints {
 		double sl3 = p.slopeTo(s);
 		if (Double.compare(sl1, sl2) == 0 && Double.compare(sl3, sl2) == 0 ) {
 			Arrays.sort(quadruple);
-			segmentPoints.add(new PointTuple(quadruple[0], quadruple[3], sl1));
+			lineSegments.add(new LineSegment(quadruple[0], quadruple[3]));
+//			segmentPoints.add(new PointTuple(quadruple[0], quadruple[3], sl1));
 		}
 	}
 
