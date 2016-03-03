@@ -18,7 +18,8 @@ public class KdTreeVisualizer {
     public static void main(String[] args) {
         RectHV rect = new RectHV(0.0, 0.0, 1.0, 1.0);
         StdDraw.show(0);
-        KdTree kdtree = new KdTree();
+//        KdTree kdtree = new KdTree();
+        PointSET kdtree = new PointSET();
         while (true) {
             if (StdDraw.mousePressed()) {
                 double x = StdDraw.mouseX();

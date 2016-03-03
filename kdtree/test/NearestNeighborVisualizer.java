@@ -18,7 +18,7 @@ import edu.princeton.cs.algs4.StdDraw;
 public class NearestNeighborVisualizer {
 
     public static void main(String[] args) {
-        String filename = args[0];
+        String filename = "test/circle10.txt";
         In in = new In(filename);
 
         StdDraw.show(0);
@@ -35,7 +35,6 @@ public class NearestNeighborVisualizer {
         }
 
         while (true) {
-
             // the location (x, y) of the mouse
             double x = StdDraw.mouseX();
             double y = StdDraw.mouseY();
@@ -48,14 +47,13 @@ public class NearestNeighborVisualizer {
             brute.draw();
 
             // draw in red the nearest neighbor (using brute-force algorithm)
-            StdDraw.setPenRadius(.03);
-            StdDraw.setPenColor(StdDraw.RED);
-            brute.nearest(query).draw();
-            StdDraw.setPenRadius(.02);
-
-            // draw in blue the nearest neighbor (using kd-tree algorithm)
-            StdDraw.setPenColor(StdDraw.BLUE);
-            kdtree.nearest(query).draw();
+//            StdDraw.setPenRadius(.02);
+//            StdDraw.setPenColor(StdDraw.RED);
+//            brute.nearest(query).draw();
+        	StdDraw.setPenRadius(.03);
+        	// draw in blue the nearest neighbor (using kd-tree algorithm)
+    		StdDraw.setPenColor(StdDraw.BLUE);
+    		kdtree.nearest(query).draw();
             StdDraw.show(0);
             StdDraw.show(40);
         }
