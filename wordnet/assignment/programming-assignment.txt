@@ -1,0 +1,31 @@
+Programming Assignment 1: WordNet: Instructions Help Center
+
+Specification
+Here is the programming assignment specification that describes the assignment requirements.
+
+Be sure that your code conforms to the prescribed APIs, including being in the "default" package and including only the public methods and constructors specified. Note that, as of Fall 2015, algs4.jar uses a "named" package, so you must use an import statement to access a class in algs4.jar.
+
+
+Checklist
+The checklist contains frequently asked questions and hints. If you're not sure where to start, see the section at the end of the checklist.
+
+
+Testing
+The file wordnet-testing.zip contains sample data files that you can use to test SAP.java, WordNet.java, and Outcast.java.
+
+
+Web Submission
+Submit a zip file named wordnet.zip that contains the source files SAP.java, WordNet.java, Outcast.java along with any other supporting files (excluding algs4.jar). To zip up your source files, use one of the following three approaches:
+
+Mac OS X Finder.
+Select the required files in the Finder.
+Right-click and select Compress 3 Items.
+Rename the resulting file to wordnet.zip.
+Windows.
+Select the required files in Windows Explorer.
+Right-click and select Send to -> Compressed (zipped) folder.
+Rename the resulting file to wordnet (the .zip extension is automatic).
+Command line (Linux or Mac OS X).
+Change to the directory containing the required .java files.
+Execute the command zip wordnet.zip SAP.java WordNet.java Outcast.java
+You will not receive a score or grade report unless you submit the zip file in this specified format. For example, the zip file must contain only the specified files (and not a folder containing the files). Do not use PKWare's proprietary deflate64 format—it is incompatible with our unzipping program.

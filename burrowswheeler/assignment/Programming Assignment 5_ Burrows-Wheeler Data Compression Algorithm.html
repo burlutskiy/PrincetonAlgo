@@ -1,0 +1,1083 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!-- saved from url=(0063)http://coursera.cs.princeton.edu/algs4/assignments/burrows.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>
+Programming Assignment 5: Burrows-Wheeler Data Compression Algorithm
+</title><style type="text/css"></style><style type="text/css">/*.lleo_errorSelection *::-moz-selection,
+.lleo_errorSelection *::selection,
+.lleo_errorSelection *::-webkit-selection {
+    background-color: red !important;
+    color: #fff !important;;
+}*/
+
+#lleo_dialog,
+#lleo_dialog * {
+    color: #000 !important;
+    font: normal 13px Arial, Helvetica !important;
+    line-height: 15px !important;
+    margin: 0 !important;
+	padding: 0 !important;
+	background: none !important;
+	border: none 0 !important;
+	position: static !important;
+	vertical-align: baseline !important;
+	overflow: visible !important;
+	width: auto !important;
+	height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+	float: none !important;
+	visibility: visible !important;
+	text-align: left !important;
+    text-transform: none !important;
+	border-collapse: separate !important;
+	border-spacing: 2px !important;
+    box-sizing: content-box !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    letter-spacing: normal !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    filter: none !important;
+}
+#lleo_dialog *:before,
+#lleo_dialog *:after {
+    content: '';
+}
+
+#lleo_dialog iframe {
+	height: 0 !important;
+	width: 0 !important;
+}
+
+#lleo_dialog {
+    position: absolute !important;
+    background: #fff !important;
+    border: solid 1px #ccc !important;
+    padding: 7px 0 0 !important;
+    left: -999px;
+    top: -999px;
+    width: 440px !important;
+    overflow: hidden;
+    display: block !important;
+    z-index: 999999999 !important;
+    box-shadow: 8px 16px 30px rgba(0, 0, 0, 0.16) !important;
+    border-radius: 3px !important;
+    opacity: 0 !important;
+    -webkit-transform: translateY(15px);
+    -moz-transform: translateY(15px);
+    -ms-transform: translateY(15px);
+    -o-transform: translateY(15px);
+    transform: translateY(15px);
+}
+#lleo_dialog.lleo_show_small {
+    width: 150px !important;
+}
+#lleo_dialog.lleo_show {
+    opacity: 1 !important;
+    -webkit-transform: translateY(0);
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    -o-transform: translateY(0);
+    transform: translateY(0);
+    -webkit-transition: -webkit-transform 0.3s, opacity 0.3s !important;
+    -moz-transition: -moz-transform 0.3s, opacity 0.3s !important;
+    -ms-transition: -ms-transform 0.3s, opacity 0.3s !important;
+    -o-transition: -o-transform 0.3s, opacity 0.3s !important;
+    transition: transform 0.3s, opacity 0.3s !important;
+}
+#lleo_dialog.lleo_collapse {
+    opacity: 0 !important;
+    -webkit-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -moz-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -ms-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -o-transform: scale(0.25, 0.1) translate(-550px, 100px);
+    transform: scale(0.25, 0.1) translate(-550px, 100px);
+    -webkit-transition: -webkit-transform 0.4s, opacity 0.4s !important;
+    -moz-transition: -moz-transform 0.4s, opacity 0.4s !important;
+    -ms-transition: -ms-transform 0.4s, opacity 0.4s !important;
+    -o-transition: -o-transform 0.4s, opacity 0.4s !important;
+    transition: transform 0.4s, opacity 0.4s !important;
+}
+#lleo_dialog input::-webkit-input-placeholder {
+    color: #aaa !important;
+}
+#lleo_dialog .lleo_has_pic #lleo_word {
+	margin-right: 80px !important;
+}
+#lleo_dialog #lleo_translationsContainer1 {
+	position: relative !important;
+}
+#lleo_dialog #lleo_translationsContainer2 {
+	padding: 7px 0 0 !important;
+	vertical-align: middle !important;
+}
+#lleo_dialog #lleo_word {
+    color: #000 !important;
+    margin: 0 5px 2px 0 !important;
+    /*float: left !important;*/
+}
+#lleo_dialog .lleo_has_sound #lleo_word {
+    margin-left: 30px !important;
+}
+#lleo_dialog #lleo_text {
+    font-weight: bold !important;
+    color: #d56e00 !important;
+    text-decoration: none !important;
+    cursor: default !important;
+}
+/*
+#lleo_dialog #lleo_text.lleo_known {
+    cursor: pointer !important;
+    text-decoration: underline !important;
+}
+*/
+/*#lleo_dialog #lleo_closeBtn {
+    position: absolute !important;
+    right: 6px !important;
+    top: 5px !important;
+    line-height: 1px !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    font-size: 0 !important;
+    color: #aaa !important;
+    display: block !important;
+	z-index: 9999999999 !important;
+	width: 7px !important;
+	height: 7px !important;
+	padding: 0 !important;
+	margin: 0 !important;
+}*/
+
+#lleo_dialog #lleo_optionsBtn {
+    position: absolute !important; 
+    right: 3px !important;
+    top: 5px !important;
+    line-height: 1px !important;
+    text-decoration: none !important;
+    font-weight: bold !important;
+    font-size: 13px !important;
+    color: #aaa !important;
+    padding: 2px !important;
+	display: none;
+}
+    #lleo_dialog.lleo_optionsShown #lleo_optionsBtn {
+        display: block !important;
+    }
+    #lleo_dialog #lleo_optionsBtn img {
+        width: 12px !important;
+        height: 12px !important;
+    }
+#lleo_dialog #lleo_sound {
+    float: left !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-left: 9px !important;
+    margin-right: 3px !important;
+    background: 0 0 no-repeat !important;
+    cursor: pointer !important;
+    display: none !important;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAfNJREFUeNq0U01IVFEU/u57Oo5WhBRIBBptykWLYBa2soWiEKQQEbrSFsGbVRQKQc2iFqGitXqvjQxCoCJCqyI0aBUtZILaJNUuYWYWo8HovJ/707nP94bnz0rxwvfOuefd8517fi5TSuE4i50YwZ3l37ZhNlpgzFkaaM/G9sHF1YskNrT+7l4PjMOcb78t2JL71uxgB+2UlfxHTtq5N94fIOh/88kWgWfl73ZCSQkpeGg3H091JY6dI2S00qA/N3KO3dDUYhFgEmZGurG+w9FqApIHsVM7kaTF9Nhn0r8Q7hPWQgIRuNaH3AMUA4W/Lkdh04cpFS43G0TgxQTvCdMETVAk3KynIHwXZU/ge8XDt7KH9bKLjU0P2zVO5LsEpSejVRJ9UR18EtfqKegovs9R3Q6w9c/H1o4Aa2Jwm1lIvn9RJ4w9RdRRzqcYrpwycCll4Cy1lnkS3Bc6vfBg28v8aRIfI78zhB/1GygROH3jLyyzMQ0zlUZuZBSlKkeLoegGtTjYLcJ8pF+NakHOFC2J6w+f25mxSfWrWFF/ShXVPTGvtN14NNkVnxlYWJkgZEL7/vwKr55lKSVnaGYWkuYgrgG172uUv47+U7fw0EHaJXmalUQy/HqO6lBzEsVjJC4Q8kd6TETQpjuaGOvjv8b/AgwA/ij1XMx58NIAAAAASUVORK5CYII=) !important;
+}
+#lleo_dialog .lleo_has_sound #lleo_sound {
+    display: block !important;
+}
+
+#lleo_dialog #lleo_soundWave {
+    border: solid 5px #4495CC !important;
+    border-radius: 5px !important;
+    position: absolute !important;
+    left: -5px !important;
+    top: -5px !important;
+    right: -5px !important;
+    bottom: -5px !important;
+    z-index: 0 !important;
+    opacity: 0.9 !important;
+    display: none !important;
+}
+    #lleo_dialog #lleo_soundWave.lleo_beforePlaying {
+        display: block !important;
+    }
+    #lleo_dialog #lleo_soundWave.lleo_playing {
+        opacity: 0 !important;
+        border-width: 20px !important;
+        border-radius: 30px !important;
+
+        -webkit-transform: scale(1.07,1.1) !important;
+        -moz-transform: scale(1.07,1.1) !important;
+        -ms-transform: scale(1.07,1.1) !important;
+        transform: scale(1.07,1.1) !important;
+
+        -webkit-transition: all 0.6s !important;
+        -moz-transition: all 0.6s !important;
+        -ms-transition: all 0.6s !important;
+        transition: all 0.6s !important;
+    }
+
+
+#lleo_dialog #lleo_picOuter {
+    position: absolute !important;
+    float: right !important;
+    top: 4px;
+    right: 5px;
+    z-index: 9 !important;
+    display: none !important;
+    width: 100px !important;
+}
+    #lleo_dialog.lleo_optionsShown #lleo_picOuter {
+        right: 25px;
+    }
+#lleo_dialog .lleo_has_pic #lleo_picOuter {
+    display: block !important;
+}
+    #lleo_dialog #lleo_picOuter:hover {
+        width: auto !important;
+        z-index: 11 !important;
+    }
+#lleo_dialog #lleo_pic,
+#lleo_dialog #lleo_picBig {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    border: solid 2px #fff !important;
+    -webkit-border-radius: 2px !important;
+    -moz-border-radius: 2px !important;
+	border-radius: 2px !important;
+    z-index: 1 !important;
+}
+#lleo_dialog #lleo_pic {
+	position: relative !important;
+    border: none !important;
+	width: 30px !important;
+}
+#lleo_dialog #lleo_picBig {
+    box-shadow: -1px 2px 4px rgba(0,0,0,0.3);
+    z-index: 2 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+    #lleo_dialog #lleo_picOuter:hover #lleo_picBig {
+        visibility: visible !important;
+        opacity: 1 !important;
+        -webkit-transition: opacity 0.3s !important;
+        -webkit-transition-delay: 0.3s !important;
+    }
+#lleo_dialog #lleo_transcription {
+    margin: 0 80px 4px 31px !important;
+    color: #aaaaaa !important;
+}
+#lleo_dialog .lleo_no_trans {
+    color: #aaa !important;
+}
+
+#lleo_dialog .ll-translation-counter {
+	float: right !important;
+    font-size: 11px !important;
+    color: #aaa !important;
+    padding: 2px 2px 1px 10px !important;
+}
+
+#lleo_dialog .ll-translation-text {
+	float: left !important;
+	/*width: 80% !important;*/
+}
+
+#lleo_dialog #lleo_trans a {
+    color: #3F669F !important;
+    text-decoration: none !important;
+    text-overflow: ellipsis !important;
+    padding: 1px 4px !important;
+    overflow: hidden !important;
+    float: left !important;
+    width: 320px !important;
+}
+
+#lleo_dialog .ll-translation-item {
+    color: #3F669F !important;
+    border: solid 1px #fff !important;
+    padding: 3px !important;
+    width: 100% !important;
+    float: left !important;
+	-moz-border-radius: 2px !important;
+	-webkit-border-radius: 2px !important;
+	border-radius: 2px !important;
+}
+
+#lleo_dialog .ll-translation-item:hover {
+	border: solid 1px #9FC2C9 !important;
+    background: #EDF4F6 !important;
+	cursor: pointer !important;
+}
+#lleo_dialog .ll-translation-item:hover .ll-translation-counter {
+	color: #83a0a6 !important;
+}
+
+#lleo_dialog .ll-translation-marker {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAWSURBVBhXY7RPm/+fAQkwIXNAbMICAJQ8AkvqWg/SAAAAAElFTkSuQmCC) !important;
+    display: inline-block !important;
+    width: 4px !important;
+    height: 4px !important;
+    margin: 7px 5px 2px 2px !important;
+    float: left !important;
+}
+
+#lleo_dialog #lleo_icons {
+    color: #aaa !important;
+    font-size: 11px !important;
+    background: #f8f8f8 !important;
+    padding: 10px 10px 10px 16px !important;
+}
+#lleo_icons a {
+    display: inline-block !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 10px -4px 3px !important;
+    text-decoration: none !important;
+    opacity: 0.5 !important;
+    background: url(data:image/png;base64,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) !important;
+}
+#lleo_icons a:hover {
+    opacity: 1 !important;
+}
+#lleo_icons a.lleo_google     {background-position:-34px 0 !important;}
+#lleo_icons a.lleo_multitran  {background-position:-64px 0 !important;}
+#lleo_icons a.lleo_lingvo     {background-position:-51px 0 !important; width: 12px !important;}
+#lleo_icons a.lleo_dict       {background-position:-17px 0 !important;}
+#lleo_icons a.lleo_linguee    {background-position:-81px 0 !important;}
+#lleo_icons a.lleo_michaelis  {background-position:-98px 0 !important;}
+
+#lleo_dialog #lleo_contextContainer {
+    margin: 0 !important;
+    padding: 3px 15px 8px 10px !important;
+    background: #eee !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee)) !important;
+    background: -moz-linear-gradient(-90deg, #fff, #eee) !important;
+    border-bottom: solid 1px #ddd !important;
+    border-top-left-radius: 3px !important;
+    border-top-right-radius: 3px !important;
+    display: none !important;
+    overflow: hidden !important;
+}
+#lleo_dialog .lleo_has_context #lleo_contextContainer {
+    display: block !important;
+}
+#lleo_dialog #lleo_context {
+    color: #444 !important;
+    text-shadow: 1px 1px 0 #f4f4f4 !important;
+    line-height: 12px !important;
+    font-size: 11px !important;
+    margin-left: 2px !important;
+}
+#lleo_dialog #lleo_context b {
+    line-height: 12px !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    font-size: 11px !important;
+}
+/*#lleo_dialog #lleo_gBrand {
+    color: #aaa !important;
+    font-size: 10px !important;
+    *//*padding-right: 52px !important;*//*
+    padding-bottom: 14px !important;
+    margin: -3px 4px 0 4px !important;
+    background: left bottom url(data:image/png;base64,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) no-repeat !important;
+    display: inline-block !important;
+    float: right !important;
+}
+#lleo_dialog #lleo_gBrand.hidden {
+    display: none !important;
+}*/
+#lleo_dialog #lleo_translateContextLink {
+    color: #444 !important;
+    text-shadow: 1px 1px 0 #f4f4f4 !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#ddd)) !important;
+    background: -moz-linear-gradient(-90deg, #f4f4f4, #ddd) !important;
+    border: solid 1px !important;
+    box-shadow: 1px 1px 0 #f6f6f6 !important;
+    border-color: #999 #aaa #aaa #999 !important;
+    -moz-border-radius: 2px !important;
+	-webkit-border-radius: 2px !important;
+	border-radius: 2px !important;
+    padding: 0 3px !important;
+    font-size: 11px !important;
+    text-decoration: none !important;
+    margin: 1px 5px 0 !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+#lleo_dialog #lleo_translateContextLink:hover {
+    background: #f8f8f8 !important;
+}
+#lleo_dialog #lleo_translateContextLink.hidden {
+    visibility: hidden !important;
+}
+
+#lleo_dialog #lleo_setTransForm {
+    display: block !important;
+    margin-top: 3px !important;
+    padding-top: 5px !important;
+    /* Set position and background because the form might be overlapped by an image when no translations */
+    position: relative !important;
+    background: #fff !important;
+    z-index: 10 !important;
+    padding-bottom: 10px !important;
+    padding-left: 16px !important;
+}
+#lleo_dialog .lleo-custom-translation {
+    padding: 4px 5px !important;
+    border: solid 1px #ddd !important;
+	border-radius: 2px !important;
+    width: 90% !important;
+    min-width: 270px !important;
+    background: -webkit-gradient(linear, 0 0, 0 20, from(#f1f1f1), to(#fff)) !important;
+    background: -moz-linear-gradient(-90deg, #f1f1f1, #fff) !important;
+	font: normal 13px Arial, Helvetica !important;
+	line-height: 15px !important;
+}
+#lleo_dialog .lleo-custom-translation:hover {
+    border: solid 1px #aaa !important;
+}
+#lleo_dialog .lleo-custom-translation:focus {
+    background: #FFFEC9 !important;
+}
+
+#lleo_dialog *.hidden {
+    display: none !important;
+}
+
+#lleo_dialog .infinitive{
+    color: #D56E00 !important;
+    text-decoration: none;
+    border-bottom: 1px dotted #D56E00 !important;
+}
+#lleo_dialog .infinitive:hover{
+    border: none !important;
+}
+
+#lleo_dialog .lleo_separator {
+    height: 1px !important;
+    background: #eee;
+    margin-top: 10px !important;
+    background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%,#eee 8%,rgba(255,255,255,1) 80%) !important;
+    background: -moz-linear-gradient(left, rgba(255,255,255,1) 0%, #eee 8%, rgba(255,255,255,1) 80%) !important;
+    background: -ms-linear-gradient(left, rgba(255,255,255,1) 0%,#eee 8%,rgba(255,255,255,1) 80%) !important;
+    background: linear-gradient(to right, rgba(255,255,255,1) 0%,#eee 8%,rgba(255,255,255,1) 80%) !important;
+}
+#lleo_dialog #lleo_trans {
+    /*border-top: 1px solid #eeeeee !important;*/
+    padding: 5px 30px 0 14px !important;
+    zoom: 1;
+}
+
+#lleo_dialog .lleo_clearfix {
+	display: block !important;
+	clear: both !important;
+	visibility: hidden !important;
+	height: 0 !important;
+	font-size: 0 !important;
+}
+
+
+#lleo_dialog #lleo_picOuter table {
+    width: 44px !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: 0 !important;
+    vertical-align: middle !important;
+}
+
+#lleo_dialog #lleo_picOuter td {
+    width: 38px !important;
+    height: 38px !important;
+    /*border: 1px solid #eeeeee !important;*/
+    vertical-align: middle !important;
+    text-align: center !important;
+}
+
+#lleo_dialog #lleo_picOuter td div {
+	height: 38px !important;
+	overflow: hidden !important;
+}
+
+#lleo_dialog .lleo_empty {
+    margin: 0 5px 7px !important;
+}
+
+#lleo_youtubeExportBtn {
+    margin-left: 10px;
+    height: 24px;
+}
+    #lleo_youtubeExportBtn i {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background: 0 0 url(https://d144fqpiyasmrr.cloudfront.net/plugins/all/images/i16.png) !important;
+    }
+    #lleo_youtubeExportBtn .yt-uix-button-content {
+        font-size: 12px;
+        line-height: 2px;
+    }
+
+
+/*** Parsed Lyrics Content *****************************/
+
+.lleo_lyrics tran {
+    background: transparent !important;
+    border-radius: 2px !important;
+    text-shadow: none !important;
+    cursor: pointer !important;
+}
+    .lleo_lyrics tran:hover {
+        color: #fff !important;
+        background: #C77213 !important;
+        -webkit-transition: all 0.1s !important;
+        -moz-transition: all 0.1s !important;
+        -ms-transition: all 0.1s !important;
+        -o-transition: all 0.1s !important;
+        transition: all 0.1s !important;
+    }
+
+.lleo_songName {
+    border: solid 1px #ffd47c;
+    background: #fff1c2;
+    border-radius: 2px;
+}
+
+.lleo_hidden_iframe {
+    visibility: hidden;
+}</style></head>
+
+<body>
+<h2>Programming Assignment 5: Burrows-Wheeler Data Compression</h2>
+
+<p>
+
+Implement the
+Burrows-Wheeler data compression algorithm.
+This revolutionary algorithm outcompresses gzip and PKZIP,
+is relatively easy to implement, and is not protected
+by any patents. It forms the basis of the Unix compression utility 
+<a href="http://www.bzip.org/">bzip2</a>.
+
+</p><p>
+The Burrows-Wheeler compression algorithm consists of three
+algorithmic components, which are applied in succession:
+</p><ol>
+<p></p><li>
+<em>Burrows-Wheeler transform.</em>
+Given a typical English text file, transform it into a text file in which
+sequences of the same character occur near each other many times.
+
+<p></p></li><li>
+<em>Move-to-front encoding.</em>
+Given a text file in which sequences of the same character occur near each other
+many times,
+convert it into a text file in which certain characters appear more 
+frequently than others.
+
+<p></p></li><li>
+<em>Huffman compression.</em>
+Given a text file in which certain characters appear more frequently than
+others, compress it by encoding
+frequently occurring characters with short codewords and rare ones with long codewords.
+
+</li></ol>
+
+Step 3 is the one that compresses the message: it 
+is particularly effective because Steps 1 and 2 steps result in a text file in which 
+certain characters appear much more frequently than others.
+To expand a message, apply the inverse operations in reverse order: first
+apply the Huffman expansion, then the move-to-front decoding, and finally
+the inverse Burrows-Wheeler transform. Your task is to implement 
+Burrows-Wheeler and move-to-front components efficiently.
+
+
+<p><b>Binary input and binary output.</b>
+To enable your programs to work with binary data, you will use
+<a href="http://algs4.cs.princeton.edu/code/javadoc/edu/princeton/cs/algs4/BinaryStdIn.html">BinaryStdIn</a> and
+<a href="http://algs4.cs.princeton.edu/code/javadoc/edu/princeton/cs/algs4/BinaryStdOut.html">BinaryStdOut</a>, 
+which are described in <em>Algorithms, 4th edition</em> and part of <tt>algs4.jar</tt>.
+To display the binary output when debugging, you can use
+<a href="http://algs4.cs.princeton.edu/code/javadoc/edu/princeton/cs/algs4/HexDump.html">HexDump</a>,
+which takes a command-line argument <em>N</em>,
+reads bytes from standard input and writes them to standard
+output in hexadecimal, <em>N</em> per line.
+
+</p><blockquote><pre>% <b>more abra.txt</b>
+ABRACADABRA!
+
+% <b>java  edu.princeton.cs.algs4.HexDump 16 &lt; abra.txt</b>
+41 42 52 41 43 41 44 41 42 52 41 21
+96 bits
+</pre></blockquote>
+
+Note that in ASCII, <tt>'A'</tt> is 41 (hex) and <tt>'!'</tt> is 21 (hex).
+
+
+<p><b>Huffman encoding and decoding.</b>
+<a href="http://algs4.cs.princeton.edu/code/javadoc/edu/princeton/cs/algs4/Huffman.html">Huffman</a>
+(Program 5.10 in <em>Algorithms, 4th edition</em>) 
+implements the classic Huffman compression and expansion algorithms.
+</p><blockquote><pre>% <b>java edu.princeton.cs.algs4.Huffman - &lt; abra.txt | java  edu.princeton.cs.algs4.HexDump 16</b>
+50 4a 22 43 43 54 a8 40 00 00 01 8f 96 8f 94
+120 bits
+</pre></blockquote>
+
+<blockquote><pre>% <b>java  edu.princeton.cs.algs4.Huffman - &lt; abra.txt | java  edu.princeton.cs.algs4.Huffman +</b>
+ABRACADABRA!
+</pre></blockquote>
+
+You will not write any code for this step.
+
+<p>
+<b>Move-to-front encoding and decoding.</b>
+The main idea of <em>move-to-front</em> encoding is to maintain an ordered sequence
+of the characters in the alphabet,
+and repeatedly read in a character from the input message,
+print out the position in which that character appears, and move that character to
+the front of the sequence. As a simple example, if the initial ordering over a 6-character
+alphabet is <tt>A B C D E F</tt>, and we want to encode
+the input <tt>CAAABCCCACCF</tt>, then we would update the move-to-front
+sequences as follows:
+</p><blockquote><pre>move-to-front    in   out
+-------------    ---  ---
+ A B C D E F      C    2 
+ C A B D E F      A    1
+ A C B D E F      A    0
+ A C B D E F      A    0
+ A C B D E F      B    2
+ B A C D E F      C    2
+ C B A D E F      C    0
+ C B A D E F      C    0
+ C B A D E F      A    2
+ A C B D E F      C    1
+ C A B D E F      C    0
+ C A B D E F      F    5
+ F C A B D E  
+</pre></blockquote>
+If the same character occurs next to each other many times in the input,
+then many of the output values will be small integers, such as 0, 1, and 2.
+The extremely high frequency of certain characters makes an ideal scenario
+for Huffman coding.
+
+<ul>
+<p></p><li><em>Move-to-front encoding.</em>
+Your task is to maintain an ordered sequence
+of the 256 extended ASCII characters. Initialize
+the sequence by making the <em>i</em>th character in the sequence
+equal to the <em>i</em>th
+extended ASCII character.
+Now, read in each 8-bit character <tt>c</tt> from standard input
+one at a time, output the 8-bit index in the sequence where <tt>c</tt> appears,
+and move <tt>c</tt> to the front.
+
+<blockquote>
+<pre>% <b>java MoveToFront - &lt; abra.txt | java  edu.princeton.cs.algs4.HexDump 16</b>
+41 42 52 02 44 01 45 01 04 04 02 26
+96 bits
+</pre>
+</blockquote>
+
+<p></p></li><li><em>Move-to-front decoding.</em>
+Initialize an ordered sequence of 256 characters, where extended ASCII character
+<em>i</em> appears <em>i</em>th in the sequence.
+Now, read in each 8-bit character <em>i</em>
+(but treat it as an integer between 0 and 255) from
+standard input one at a time, write the <em>i</em>th character in the sequence,
+and move that character to the front.
+Check that the decoder recovers any encoded message.
+
+<blockquote>
+<pre>% <b>java MoveToFront - &lt; abra.txt | java MoveToFront +</b>
+ABRACADABRA!
+</pre>
+</blockquote>
+
+</li></ul>
+
+Name your program <tt>MoveToFront.java</tt> and organize it using the following API:
+
+<blockquote>
+<pre><b>public class MoveToFront {</b>
+    <font color="gray">// apply move-to-front encoding, reading from standard input and writing to standard output</font>
+    <b>public static void encode()</b>
+
+    <font color="gray">// apply move-to-front decoding, reading from standard input and writing to standard output</font>
+    <b>public static void decode()</b>
+
+    <font color="gray">// if args[0] is '-', apply move-to-front encoding</font>
+    <font color="gray">// if args[0] is '+', apply move-to-front decoding</font>
+    <b>public static void main(String[] args)</b>
+<b>}</b>
+</pre>
+</blockquote>
+
+<em>Performance requirements.</em>
+The running time of move-to-front encoding and decoding should be
+proportional to <em>R N</em> (or better) in the worst case
+and proportional to <em>N</em> + <em>R</em> (or better)
+in practice on inputs that arise when compressing typical English text, where <em>N</em>
+is the number of characters in the input and <em>R</em> is the alphabet size.
+
+
+
+<p><b>Circular suffix array.</b>
+To efficiently implement the key component in the Burrows-Wheeler transform,
+you will use a fundamental
+data structure known as the <em>circular suffix array</em>, which describes
+the abstraction of a sorted array of the <em>N</em>
+circular suffixes of a string of length <em>N</em>.
+<!--
+(It is similar to the <em>sufix array</em> data structure described
+on pp. 875-885 of the textbook.)
+-->
+As an example, consider the string "<tt>ABRACADABRA!</tt>" of length 12.
+The table below shows its 12 circular suffixes and the result of sorting them.
+
+</p><blockquote>
+<pre> i       Original Suffixes           Sorted Suffixes         index[i]
+--    -----------------------     -----------------------    --------
+ 0    A B R A C A D A B R A !     ! A B R A C A D A B R A    <font color="blue">11</font>
+ 1    B R A C A D A B R A ! A     A ! A B R A C A D A B R    <font color="blue">10</font>
+ 2    R A C A D A B R A ! A B     A B R A ! A B R A C A D    <font color="blue">7</font>
+ 3    A C A D A B R A ! A B R     A B R A C A D A B R A !    <font color="blue">0</font>
+ 4    C A D A B R A ! A B R A     A C A D A B R A ! A B R    <font color="blue">3</font>
+ 5    A D A B R A ! A B R A C     A D A B R A ! A B R A C    <font color="blue">5</font>
+ 6    D A B R A ! A B R A C A     B R A ! A B R A C A D A    <font color="blue">8</font>
+ 7    A B R A ! A B R A C A D     B R A C A D A B R A ! A    <font color="blue">1</font>
+ 8    B R A ! A B R A C A D A     C A D A B R A ! A B R A    <font color="blue">4</font>
+ 9    R A ! A B R A C A D A B     D A B R A ! A B R A C A    <font color="blue">6</font>
+10    A ! A B R A C A D A B R     R A ! A B R A C A D A B    <font color="blue">9</font>
+11    ! A B R A C A D A B R A     R A C A D A B R A ! A B    <font color="blue">2</font>
+</pre>
+</blockquote>
+
+We define <tt>index[i]</tt> to be the index of the original suffix 
+that appears <em>ith</em> in the sorted array.
+For example, <tt>index[11]</tt> = <tt>2</tt> means that the 2<em>nd</em> original suffix
+appears 11<em>th</em> in the sorted order (i.e., last alphabetically).
+
+
+<p>
+Your job is to implement the following circular suffix array API, which provides
+the client access to the <tt>index[]</tt> values:
+
+</p><blockquote>
+<pre><b>public class CircularSuffixArray {</b>
+    <b>public CircularSuffixArray(String s)</b>  <font color="gray">// circular suffix array of s</font>
+    <b>public int length()</b>                   <font color="gray">// length of s</font>
+    <b>public int index(int i)</b>               <font color="gray">// returns index of ith sorted suffix</font>
+    <b>public static void main(String[] args)</b><font color="gray">// unit testing of the methods (optional)</font>
+<b>}</b>
+</pre>
+</blockquote>
+
+<em>Corner cases.</em>
+The constructor should throw a <tt>java.lang.NullPointerException</tt>
+if the argument is <tt>null</tt>; the method <tt>index()</tt> should throw a
+<tt>java.lang.IndexOutOfBoundsException</tt> if <tt>i</tt> is outside its prescribed range
+(between 0 and <em>N</em> − 1).
+
+<p><em>Performance requirements.</em>
+Your data type should use space proportional to <em>N</em>.
+The constructor should take time proportional to <em>N</em> log <em>N</em> (or better)
+on typical English text;
+the methods <tt>length()</tt> and <tt>index()</tt> should take constant time
+in the worst case.
+<em>Warning</em>: beginning  with
+<a href="http://java-performance.info/changes-to-string-java-1-7-0_06">Java 7, Update 6</a>,
+the <tt>substring()</tt> method takes time and space proportional to the 
+length of the substring—in other words, you cannot form the <em>N</em>
+circular suffixes explicitly because that would  take both quadratic time and space.
+
+
+</p><p>
+<b>Burrows-Wheeler transform.</b>
+The goal of the Burrows-Wheeler transform is not to compress a message, but rather
+to transform it into a form that is more amenable to compression.
+The transform rearranges the characters in the input so that
+there are lots of clusters with repeated characters, but in such a way that
+it is still possible to recover the original input.
+It relies on the following intuition: if you see the letters <tt>hen</tt>
+in English text, then most of the time the letter preceding it is 
+<tt>t</tt> or <tt>w</tt>. If you could somehow group all such
+preceding letters together (mostly <tt>t</tt>'s and some <tt>w</tt>'s),
+then you would have an easy opportunity for data compression.
+
+</p><ul>
+<p></p><li><em>Burrows-Wheeler encoding.</em>
+The Burrows-Wheeler transform of a string <em>s</em> of length <em>N</em>
+is defined as follows:
+Consider the result of sorting the <em>N</em> circular suffixes of <em>s</em>.
+The Burrows-Wheeler transform 
+is the last column in the sorted suffixes array <tt>t[]</tt>,
+preceded by the row number <tt>first</tt> in which the original string ends up.
+Continuing with the "<tt>ABRACADABRA!</tt>" example above,
+we highlight the two components of the Burrows-Wheeler transform in the table below.
+
+<blockquote>
+<pre> i     Original Suffixes          Sorted Suffixes       t    index[i]
+--    -----------------------     -----------------------    --------
+ 0    A B R A C A D A B R A !     ! A B R A C A D A B R <font color="blue">A</font>    11
+ 1    B R A C A D A B R A ! A     A ! A B R A C A D A B <font color="blue">R</font>    10
+ 2    R A C A D A B R A ! A B     A B R A ! A B R A C A <font color="blue">D</font>    7
+<font color="blue">*3</font>    A C A D A B R A ! A B R     A B R A C A D A B R A <font color="blue">!</font>   *0
+ 4    C A D A B R A ! A B R A     A C A D A B R A ! A B <font color="blue">R</font>    3
+ 5    A D A B R A ! A B R A C     A D A B R A ! A B R A <font color="blue">C</font>    5
+ 6    D A B R A ! A B R A C A     B R A ! A B R A C A D <font color="blue">A</font>    8
+ 7    A B R A ! A B R A C A D     B R A C A D A B R A ! <font color="blue">A</font>    1
+ 8    B R A ! A B R A C A D A     C A D A B R A ! A B R <font color="blue">A</font>    4
+ 9    R A ! A B R A C A D A B     D A B R A ! A B R A C <font color="blue">A</font>    6
+10    A ! A B R A C A D A B R     R A ! A B R A C A D A <font color="blue">B</font>    9
+11    ! A B R A C A D A B R A     R A C A D A B R A ! A <font color="blue">B</font>    2
+</pre>
+</blockquote>
+
+Since the original string <tt>ABRACADABRA!</tt> ends up in row 3,
+we have <tt>first</tt> = <tt>3</tt>. Thus, the Burrows-Wheeler transform is
+
+<blockquote>
+<pre>3
+ARD!RCAAAABB
+</pre>
+</blockquote>
+
+Notice how there are 4 consecutive <tt>A</tt>s and 2 consecutive 
+<tt>B</tt>s—these clusters make the message easier to compress.
+
+<blockquote>
+<pre>% <b>java BurrowsWheeler - &lt; abra.txt | java edu.princeton.cs.algs4.HexDump 16</b>
+00 00 00 03 41 52 44 21 52 43 41 41 41 41 42 42
+128 bits
+</pre>
+</blockquote>
+
+Also, note that the integer 3 is represented using 4 bytes (<tt>00 00 00 03</tt>).
+The character <tt>'A'</tt> is represented by hex <tt>41</tt>, the character
+<tt>'R'</tt> by <tt>52</tt>, and so forth.
+
+
+<p></p></li><li><em>Burrows-Wheeler decoder.</em>
+Now, we describe how to invert the Burrows-Wheeler transform and recover
+the original input string.
+If the <em>jth</em> original suffix (original string, shifted <em>j</em>
+characters to the left) is the <em>ith</em> row in the sorted order,
+we define <tt>next[i]</tt> to be the row in the sorted order 
+where the (<em>j</em> + 1)<em>st</em> original suffix appears. For example, if <tt>first</tt>
+is the row in which the original input string appears, then 
+<tt>next[first]</tt> is the row in the sorted
+order where the 1<em>st</em> original suffix (the original string left-shifted by 1) 
+appears; <tt>next[next[first]]</tt> is the row in the sorted
+order where the 2<em>nd</em> original suffix appears; <tt>next[next[next[first]]]</tt>
+is the row where the 3<em>rd</em> original suffix appears; and so forth.
+
+<ul>
+<p>
+</p><li> <em>Decoding the message given t[], first, and the next[] array.</em>
+The input to the Burrows-Wheeler decoder is the last column <tt>t[]</tt>
+of the sorted suffixes along with <tt>first</tt>.
+From <tt>t[]</tt>, we can deduce the first column
+of the sorted suffixes because it consists of precisely the same characters,
+but in sorted order.
+
+<blockquote>
+<pre> i      Sorted Suffixes     t      next
+--    -----------------------      ----
+ 0    ! ? ? ? ? ? ? ? ? ? ? A        <font color="blue">3</font>
+ 1    A ? ? ? ? ? ? ? ? ? ? R        <font color="blue">0</font>
+ 2    A ? ? ? ? ? ? ? ? ? ? D        <font color="blue">6</font>
+*3    A ? ? ? ? ? ? ? ? ? ? !        <font color="blue">7</font>
+ 4    A ? ? ? ? ? ? ? ? ? ? R        <font color="blue">8</font>
+ 5    A ? ? ? ? ? ? ? ? ? ? C        <font color="blue">9</font>
+ 6    B ? ? ? ? ? ? ? ? ? ? A       <font color="blue">10</font>
+ 7    B ? ? ? ? ? ? ? ? ? ? A       <font color="blue">11</font>
+ 8    C ? ? ? ? ? ? ? ? ? ? A        <font color="blue">5</font>
+ 9    D ? ? ? ? ? ? ? ? ? ? A        <font color="blue">2</font>
+10    R ? ? ? ? ? ? ? ? ? ? B        <font color="blue">1</font>
+11    R ? ? ? ? ? ? ? ? ? ? B        <font color="blue">4</font>
+</pre>
+</blockquote>
+
+Now, given the <tt>next[]</tt> array and <tt>first</tt>, we can reconstruct the
+original input string because the first character of the <em>i</em>th original suffix
+is the <em>i</em>th character in the input string.
+In the example above, since <tt>first</tt> = <tt>3</tt>, we know that
+the original input string appears in row 3; thus, the original input string
+starts with <tt>'A'</tt> (and ends with <tt>'!'</tt>).
+Since <tt>next[first]</tt> = <tt>7</tt>, the next original suffix appears
+in row 7; thus, the next character in the original input string is <tt>'B'</tt>.
+Since <tt>next[next[first]]</tt> = <tt>11</tt>, the next original suffix
+appears in row 11; thus, the next character in the original input
+string is <tt>'R'</tt>.
+
+
+<!--
+Since the <em>j</em><em>th</em>
+original suffix is the original string 
+left-shifted by <em>j</em> positions, its last character is the
+(<em>j</em> - 1)<em>th</em> character of the original string. Thus, we can determine
+(<em>j</em> - 1)<em>th</em> character of the original by examining the last 
+character in the row in the sorted order where the
+<em>j</em><em>th</em> original suffix appears. 
+-->
+<!--
+This is simple using <em>next[]</em> if we 
+take advantage of the observation that the <em>k</em>th original suffix appears on 
+row number next[next[...[first]...]], where the number of occurrences of next is equal 
+to <em>k</em>.
+-->
+<!--
+This leads to the simple Java implementation below:
+<blockquote>
+<pre>
+int[] next = { 3, 0, 6, 7, 8, 9, 10, 11, 5, 2, 1, 4 };
+int N = next.length;
+String t = "ARD!RCAAAABB";
+int i = 3;
+for (int count = 0; count < N; count++) {
+   i = next[i];
+   BinaryStdOut.write(t.charAt(i));
+}
+BinaryStdOut.close();
+</pre>
+</blockquote>
+-->
+
+<p></p></li><li> <em>Constructing the next[] array from t[] and first.</em>
+Amazingly, the information contained in the Burrows-Wheeler
+transform suffices to reconstruct the <tt>next[]</tt> array, and,
+hence, the original message! Here's how.
+It is easy to deduce a <tt>next[]</tt> value for a character that appears exactly once 
+in the input string.
+For example, consider the suffix that starts with <tt>'C'</tt>.
+By inspecting the first column, it appears 8<em>th</em> in the sorted order.
+The next original suffix after this one will have the character <tt>'C'</tt>
+as its last character.
+By inspecting the last column, the next original appears 5<em>th</em>
+in the sorted order.
+Thus, <tt>next[8]</tt> = <tt>5</tt>.
+Similarly, <tt>'D'</tt> and <tt>'!'</tt> each occur only once, so we can
+deduce that <tt>next[9]</tt> = <tt>2</tt> and <tt>next[0]</tt> = <tt>3</tt>.
+
+<blockquote>
+<pre> i      Sorted Suffixes     t      next
+--    -----------------------      ----
+ 0    ! ? ? ? ? ? ? ? ? ? ? A        3
+ 1    A ? ? ? ? ? ? ? ? ? ? R
+ 2    A ? ? ? ? ? ? ? ? ? ? D
+*3    A ? ? ? ? ? ? ? ? ? ? !
+ 4    A ? ? ? ? ? ? ? ? ? ? R 
+ 5    A ? ? ? ? ? ? ? ? ? ? C
+ 6    B ? ? ? ? ? ? ? ? ? ? A
+ 7    B ? ? ? ? ? ? ? ? ? ? A
+ 8    C ? ? ? ? ? ? ? ? ? ? A        5
+ 9    D ? ? ? ? ? ? ? ? ? ? A        2
+10    R ? ? ? ? ? ? ? ? ? ? B
+11    R ? ? ? ? ? ? ? ? ? ? B
+</pre>
+</blockquote>
+
+However, since <tt>'R'</tt> appears twice, it may seem ambiguous
+whether <tt>next[10]</tt> = <tt>1</tt>
+and <tt>next[11]</tt> = <tt>4</tt>,
+or whether <tt>next[10]</tt> = <tt>4</tt> and <tt>next[11]</tt> = <tt>1</tt>.
+Here's the key rule that resolves the apparent ambiguity:
+<blockquote>
+<em>If sorted row i and j both start with the same
+character and i &lt; j,
+then next[i] &lt; next[j].</em>
+</blockquote>
+
+<!-- provided there are at least 2 distinct characters in the input -->
+
+This rule implies <tt>next[10]</tt> = <tt>1</tt>
+and <tt>next[11]</tt> = <tt>4</tt>.
+Why is this rule valid?
+The rows are sorted so row 10 is lexicographically
+less than row 11. Thus the ten unknown characters in row 10
+must be less than the ten unknown characters in
+row 11 (since both start with <tt>'R'</tt>).
+We also know that between the two rows that end with
+<tt>'R'</tt>, row 1 is less than row 4.
+But, the ten unknown characters in row 10 and 11
+are precisely the first ten characters in rows 1 and 4.
+Thus, <tt>next[10]</tt> = <tt>1</tt>
+and <tt>next[11]</tt> = <tt>4</tt> or this would contradict the fact
+that the suffixes are sorted.
+
+</li></ul>
+
+<p>
+Check that the decoder recovers any encoded message.
+
+</p><blockquote>
+<pre>% <b>java BurrowsWheeler - &lt; abra.txt | java BurrowsWheeler +</b>
+ABRACADABRA!
+</pre>
+</blockquote>
+
+</li></ul>
+
+
+Name your program <tt>BurrowsWheeler.java</tt> and organize it using the following API:
+
+<blockquote>
+<pre><b>public class BurrowsWheeler {</b>
+    <font color="gray">// apply Burrows-Wheeler encoding, reading from standard input and writing to standard output</font>
+    <b>public static void encode()</b>
+
+    <font color="gray">// apply Burrows-Wheeler decoding, reading from standard input and writing to standard output</font>
+    <b>public static void decode()</b>
+
+    <font color="gray">// if args[0] is '-', apply Burrows-Wheeler encoding</font>
+    <font color="gray">// if args[0] is '+', apply Burrows-Wheeler decoding</font>
+    <b>public static void main(String[] args)</b>
+<b>}</b>
+</pre>
+</blockquote>
+
+<em>Performance requirements.</em>
+The running time of your Burrows-Wheeler encoder should be proportional to
+<em>N</em> + <em>R</em> (or better) in the worst case, excluding the time to construct the 
+circular suffix array.
+The running time of your Burrows-Wheeler decoder should be proportional to 
+<em>N</em> + <em>R</em> (or better) in the worst case.
+
+
+<p><b>Analysis (optional).</b>
+Once you have <tt>MoveToFront.java</tt> and <tt>BurrowsWheeler.java</tt> working,
+compress some of these
+<a href="http://coursera.cs.princeton.edu/algs4/testing/textfiles/">text files</a>;
+then, test it on some binary files.
+Calculate the compression ratio achieved for each file 
+and report the time to compress and expand each file.
+(Here, compression and expansion consists of applying <tt>BurrowsWheeler</tt>,
+<tt>MoveToFront</tt>, and <tt>Huffman</tt> in succession.)
+Finally, determine the order of growth of the running time 
+of each of your encoders and decoders, both in the worst case and on typical
+English text inputs.
+
+</p><p><b>Deliverables.</b>
+Submit <tt>MoveToFront.java</tt>, <tt>BurrowsWheeler.java</tt>,
+<tt>CircularSuffixArray.java</tt>, and any other supporting files
+(excluding <tt>algs4.jar</tt>).
+You may not call any library functions other those in
+<tt>java.lang</tt>, <tt>java.util</tt>, and <tt>algs4.jar</tt>.
+
+<br>
+<br>
+
+
+</p><address><small>
+This assignment was developed by Kevin Wayne.
+<br>Copyright © 2004.
+</small>
+</address>
+
+
+
+
+
+</body></html>
