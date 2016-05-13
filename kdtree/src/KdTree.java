@@ -3,7 +3,6 @@ import java.util.Queue;
 
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.StdDraw;
 
 public class KdTree {
 	private static class Node{
@@ -157,25 +156,4 @@ public class KdTree {
 		}
 	}
 
-	// unit testing of the methods (optional)
-	public static void main(String[] args) {
-//		KdTree kdTree = new KdTree();
-//		kdTree.insert(new Point2D(5, 3));
-//		kdTree.insert(new Point2D(7, 2));
-//		kdTree.insert(new Point2D(3, 4));
-//		kdTree.insert(new Point2D(2, 1));
-//		kdTree.insert(new Point2D(1, 3));
-//		kdTree.insert(new Point2D(4, 6));
-//		kdTree.insert(new Point2D(6, 1));
-//		kdTree.insert(new Point2D(9, 6));
-//		kdTree.insert(new Point2D(8, 5));
-//		kdTree.insert(new Point2D(7, .5));
-//		System.out.println(kdTree.range(new RectHV(5.5, 0, 8, 2.5)));
-//		System.out.println(kdTree.range(new RectHV(1, 0, 3, 2)));
-//		System.out.println(kdTree.nearest(new Point2D(4.1, 6.1)));
-		KdTree kdTree = new KdTree();
-		kdTree.insert(new Point2D(5, 3));
-		kdTree.insert(new Point2D(5, 3));
-		System.out.println(kdTree.size());
-	}
 }
